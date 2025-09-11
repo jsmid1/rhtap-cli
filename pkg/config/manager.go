@@ -5,7 +5,7 @@ import (
 	"errors"
 	"fmt"
 
-	"github.com/redhat-appstudio/rhtap-cli/pkg/k8s"
+	"github.com/redhat-appstudio/tssc/pkg/k8s"
 
 	corev1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
@@ -48,7 +48,7 @@ func (m *ConfigMapManager) GetConfigMap(
 ) (*corev1.ConfigMap, error) {
 	coreClient, err := m.kube.CoreV1ClientSet("")
 	if err != nil {
-		return nil, nil
+		return nil, err
 	}
 
 	// Listing all ConfigMaps matching the label selector.

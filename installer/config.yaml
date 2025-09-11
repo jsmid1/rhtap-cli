@@ -27,20 +27,17 @@ tssc:
         manageSubscription: true
         # namespacePrefixes:
         #   - tssc-app
+        authProvider: github
+        # Possible values: github, gitlab, microsoft
         # RBAC:
         #   adminUsers:
         #     - myUsername
-        #   enabled: false
+        #   enabled: true
         #   orgs:
         #     - myOrg
     advancedClusterSecurity:
       enabled: &rhacsEnabled true
       namespace: &rhacsNamespace tssc-acs
-      properties:
-        manageSubscription: true
-    quay:
-      enabled: &quayEnabled true
-      namespace: &quayNamespace tssc-quay
       properties:
         manageSubscription: true
     openShiftGitOps:
@@ -79,9 +76,6 @@ tssc:
     - chart: charts/tssc-pipelines
       namespace: *installerNamespace
       enabled: *pipelinesEnabled
-    - chart: charts/tssc-quay
-      namespace: *quayNamespace
-      enabled: *quayEnabled
     - chart: charts/tssc-tpa-realm
       namespace: *trustedProfileAnalyzerNamespace
       enabled: *tpaEnabled

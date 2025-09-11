@@ -22,11 +22,9 @@ spec:
       description: The key secret from konflux-test-infra-secret where all AWS ROSA configurations are stored.
     - name: replicas
       description: 'The number of replicas for the cluster nodes.'
-      default: "3"
       type: string
     - name: machine-type
       description: 'The type of machine to use for the cluster nodes.'
-      default: "m6i.4xlarge"
       type: string
     - name: oci-container-repo
       default: 'quay.io/konflux-test-storage/rhtap-team/rhtap-cli'
@@ -154,6 +152,28 @@ spec:
             value: main
           - name: pathInRepo
             value: integration-tests/tasks/tssc-e2e.yaml
+      params:
+        - name: job-spec
+          value: $(params.job-spec)
+        - name: ocp-login-command
+          value: "$(tasks.provision-rosa.results.ocp-login-command)"
+        - name: oci-container
+          value: $(tasks.create-oci-container.results.oci-container)
+        - name: tssc-test-image
+          value: $(params.tssc-test-image)
+    - name: rhtap-ui-tests
+      runAfter:
+        - rhtap-e2e-tests
+      onError: continue
+      taskRef:
+        resolver: git
+        params:
+          - name: url
+            value: https://github.com/redhat-appstudio/tssc-test.git
+          - name: revision
+            value: main
+          - name: pathInRepo
+            value: integration-tests/tasks/tssc-ui.yaml
       params:
         - name: job-spec
           value: $(params.job-spec)

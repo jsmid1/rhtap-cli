@@ -37,7 +37,7 @@ subscriptions:
     description: OpenShift Pipelines Operator
     namespace: openshift-operators
     name: openshift-pipelines-operator-rh
-    channel: pipelines-1.18
+    channel: pipelines-1.19
     source: redhat-operators
     sourceNamespace: openshift-marketplace
   openshiftTrustedArtifactSigner:
@@ -49,20 +49,11 @@ subscriptions:
     channel: stable-v1.2
     source: redhat-operators
     sourceNamespace: openshift-marketplace
-  quay:
-    enabled: false
-    description: Red Hat Quay Operator
-    apiResource: quayregistries.quay.redhat.com
-    namespace: openshift-operators
-    name: quay-operator
-    channel: stable-3.14
-    source: redhat-operators
-    sourceNamespace: openshift-marketplace
   advancedClusterSecurity:
     enabled: false
     description: Red Hat Advanced Cluster Security Operator
     apiResource: centrals.platform.stackrox.io
-    channel: rhacs-4.7
+    channel: rhacs-4.8
     namespace: rhacs-operator
     name: rhacs-operator
     source: redhat-operators
@@ -78,16 +69,3 @@ subscriptions:
     channel: fast-1.6
     source: redhat-operators
     sourceNamespace: openshift-marketplace
-  openShiftDataFoundation:
-    enabled: false
-    description: Red Hat OpenShift Data Foundation (ODF)
-    apiResource: noobaas.noobaa.io
-    namespace: __OVERWRITE_ME__
-    name: odf-operator
-    channel: __OVERWRITE_ME__
-    source: redhat-operators
-    sourceNamespace: openshift-marketplace
-    operatorGroup:
-      upgradeStrategy: Default
-      targetNamespaces:
-        - __OVERWRITE_ME__

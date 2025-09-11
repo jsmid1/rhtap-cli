@@ -4,7 +4,7 @@ import (
 	"errors"
 	"fmt"
 
-	"github.com/redhat-appstudio/rhtap-cli/pkg/flags"
+	"github.com/redhat-appstudio/tssc/pkg/flags"
 
 	corev1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
@@ -12,6 +12,7 @@ import (
 	"k8s.io/client-go/discovery"
 	"k8s.io/client-go/dynamic"
 	"k8s.io/client-go/kubernetes"
+	batchv1client "k8s.io/client-go/kubernetes/typed/batch/v1"
 	corev1client "k8s.io/client-go/kubernetes/typed/core/v1"
 	rbacv1client "k8s.io/client-go/kubernetes/typed/rbac/v1"
 )
@@ -41,6 +42,17 @@ func (k *Kube) ClientSet(namespace string) (kubernetes.Interface, error) {
 		return nil, err
 	}
 	return kubernetes.NewForConfig(restConfig)
+}
+
+// BatchV1ClientSet returns a "batchv1" Kubernetes Clientset.l
+func (k *Kube) BatchV1ClientSet(
+	namespace string,
+) (batchv1client.BatchV1Interface, error) {
+	restConfig, err := k.RESTClientGetter(namespace).ToRESTConfig()
+	if err != nil {
+		return nil, err
+	}
+	return batchv1client.NewForConfig(restConfig)
 }
 
 // CoreV1ClientSet returns a "corev1" Kubernetes Clientset.

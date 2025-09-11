@@ -4,11 +4,11 @@ import (
 	"fmt"
 	"log/slog"
 
-	"github.com/redhat-appstudio/rhtap-cli/pkg/config"
-	"github.com/redhat-appstudio/rhtap-cli/pkg/constants"
-	"github.com/redhat-appstudio/rhtap-cli/pkg/githubapp"
-	"github.com/redhat-appstudio/rhtap-cli/pkg/integrations"
-	"github.com/redhat-appstudio/rhtap-cli/pkg/k8s"
+	"github.com/redhat-appstudio/tssc/pkg/config"
+	"github.com/redhat-appstudio/tssc/pkg/constants"
+	"github.com/redhat-appstudio/tssc/pkg/githubapp"
+	"github.com/redhat-appstudio/tssc/pkg/integrations"
+	"github.com/redhat-appstudio/tssc/pkg/k8s"
 
 	"github.com/spf13/cobra"
 )
@@ -129,7 +129,7 @@ func NewIntegrationGitHubApp(
 	p := d.cmd.PersistentFlags()
 	p.BoolVar(&d.create, "create", d.create, "Create a new GitHub App")
 	p.BoolVar(&d.update, "update", d.update, "Update an existing GitHub App")
-	gitHubIntegration.PersistentFlags(p)
-	gitHubApp.PersistentFlags(p)
+	gitHubIntegration.PersistentFlags(d.cmd)
+	gitHubApp.PersistentFlags(d.cmd)
 	return d
 }

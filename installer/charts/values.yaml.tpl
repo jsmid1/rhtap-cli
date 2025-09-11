@@ -5,13 +5,10 @@
 {{- $acs := required "Red Hat ACS settings" .Installer.Products.advancedClusterSecurity -}}
 {{- $gitops := required "GitOps settings" .Installer.Products.openShiftGitOps -}}
 {{- $pipelines := required "Pipelines settings" .Installer.Products.openShiftPipelines -}}
-{{- $quay := required "Quay settings" .Installer.Products.quay -}}
 {{- $rhdh := required "RHDH settings" .Installer.Products.developerHub -}}
 {{- $ingressDomain := required "OpenShift ingress domain" .OpenShift.Ingress.Domain -}}
 {{- $ingressRouterCA := required "OpenShift RouterCA" .OpenShift.Ingress.RouterCA -}}
 {{- $openshiftMinorVersion := required "OpenShift Version" .OpenShift.MinorVersion -}}
-{{- $odfEnabled := $quay.Enabled -}}
-{{- $odfNamespace := "openshift-storage" -}}
 ---
 debug:
   ci: {{ dig "ci" "debug" false .Installer.Settings -}}
@@ -37,9 +34,6 @@ openshift:
 {{- if $gitops.Enabled }}
     - {{ $gitops.Namespace }}
 {{- end }}
-{{- if $quay.Enabled }}
-    - {{ $quay.Namespace }}
-{{- end }}
 {{- if $tas.Enabled }}
     - {{ $tas.Namespace }}
 {{- end }}
@@ -49,15 +43,11 @@ openshift:
 {{- if $rhdh.Enabled }}
     - {{ $rhdh.Namespace }}
 {{- end }}
-{{- if $odfEnabled }}
-    - {{ $odfNamespace }}
-{{- end }}
 
 #
 # tssc-subscriptions
 #
 
-{{- $odfChannel := printf "stable-%s" $openshiftMinorVersion }}
 
 subscriptions:
   crunchyData:
@@ -86,17 +76,6 @@ subscriptions:
   developerHub:
     enabled: {{ $rhdh.Enabled }}
     managed: {{ and $rhdh.Enabled $rhdh.Properties.manageSubscription }}
-  quay:
-    enabled: {{ $quay.Enabled }}
-    managed: {{ and $quay.Enabled $quay.Properties.manageSubscription }}
-  openShiftDataFoundation:
-    enabled: {{ $odfEnabled }}
-    managed: {{ $odfEnabled }}
-    namespace: {{ $odfNamespace }}
-    channel: {{ $odfChannel }}
-    operatorGroup:
-      targetNamespaces:
-        - {{ $odfNamespace }}
 
 #
 # tssc-infrastructure
@@ -115,11 +94,6 @@ infrastructure:
   openShiftPipelines:
     enabled: {{ $pipelines.Enabled }}
     namespace: {{ $pipelines.Namespace }}
-  odf:
-    enabled: {{ $odfEnabled }}
-    backingStorageSize: 100Gi
-    backingStoreName: noobaa-pv-backing-store
-    namespace: {{ $odfNamespace }}
 
 #
 # tssc-backing-services
@@ -213,29 +187,6 @@ pipelines:
     namespace: {{ .Installer.Namespace }}
 
 #
-# tssc-quay
-#
-
-quay:
-  enabled: {{ $quay.Enabled }}
-  namespace: {{ $quay.Namespace }}
-  ingressDomain: {{ $ingressDomain }}
-  ingressRouterCA: {{ $ingressRouterCA }}
-  organization:
-    email: {{ printf "tssc@%s" $ingressDomain }}
-  secret:
-    namespace: {{ .Installer.Namespace }}
-    name: tssc-quay-integration
-  config:
-    superUser:
-      email: {{ printf "admin@%s" $ingressDomain }}
-  replicas:
-    quay: 1
-    clair: 1
-  tssc:
-    namespace: {{ .Installer.Namespace }}
-
-#
 # tssc-integrations
 #
 
@@ -245,8 +196,6 @@ integrations:
   argoCD:
     enabled: {{ $gitops.Enabled }}
     namespace: {{ $gitops.Namespace }}
-  quay:
-    enabled: {{ $quay.Enabled }}
   tssc:
     namespace: {{ .Installer.Namespace }}
 #   github:
@@ -269,19 +218,28 @@ integrations:
 {{- $catalogURL := required "Red Hat Developer Hub Catalog URL is required"
     $rhdh.Properties.catalogURL }}
 
+{{- $authProvider := required "Auth Provider is required"
+    $rhdh.Properties.authProvider }}
+
+
 developerHub:
   namespace: {{ $rhdh.Namespace }}
   ingressDomain: {{ $ingressDomain }}
   catalogURL: {{ $catalogURL }}
+  authProvider: {{ $authProvider }}
   integrationSecrets:
     namespace: {{ .Installer.Namespace }}
   RBAC:
+    enabled: {{ dig "Properties" "RBAC" "enabled" false $rhdh }}
+{{- if eq $authProvider "github" }}
     adminUsers:
 {{ dig "Properties" "RBAC" "adminUsers" (list "${GITHUB__USERNAME}") $rhdh | toYaml | indent 6 }}
-    enabled: {{ dig "Properties" "RBAC" "enabled" false $rhdh }}
     orgs:
 {{ dig "Properties" "RBAC" "orgs" (list "${GITHUB__ORG}") $rhdh | toYaml | indent 6 }}
-
+{{- else if eq $authProvider "gitlab" }}
+    adminUsers:
+{{ dig "Properties" "RBAC" "adminUsers" (list "${GITLAB__USERNAME}") $rhdh | toYaml | indent 6 }}
+{{- end }}
 #
 # tssc-tpa-realm
 #

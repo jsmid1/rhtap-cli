@@ -3,9 +3,9 @@ package subcmd
 import (
 	"log/slog"
 
-	"github.com/redhat-appstudio/rhtap-cli/pkg/config"
-	"github.com/redhat-appstudio/rhtap-cli/pkg/integrations"
-	"github.com/redhat-appstudio/rhtap-cli/pkg/k8s"
+	"github.com/redhat-appstudio/tssc/pkg/config"
+	"github.com/redhat-appstudio/tssc/pkg/integrations"
+	"github.com/redhat-appstudio/tssc/pkg/k8s"
 
 	"github.com/spf13/cobra"
 )
@@ -84,7 +84,6 @@ func NewIntegrationBitBucket(
 		bitbucketIntegration: bitbucketIntegration,
 	}
 
-	p := d.cmd.PersistentFlags()
-	bitbucketIntegration.PersistentFlags(p)
+	bitbucketIntegration.PersistentFlags(d.cmd)
 	return d
 }
